@@ -53,6 +53,7 @@ export const clinicApi = {
   selectSubscriptionPlan: (planId) => post('/api/clinic/subscription', { planId }),
   renewSubscription: () => post('/api/clinic/subscription/renew'),
   cancelSubscription: () => post('/api/clinic/subscription/cancel'),
+  analytics: (date, month) => get(`/api/clinics/me/analytics?date=${encodeURIComponent(date)}&month=${encodeURIComponent(month)}`),
 }
 export const doctorApi = {
   get: (id) => get(`/api/doctors/${id}`),
@@ -76,7 +77,8 @@ export const appointmentApi = {
   status: (id, b) => patch(`/api/appointments/${id}/status`, b),
   reschedule: (id, b) => patch(`/api/appointments/${id}/reschedule`, b),
   cancel: (id) => patch(`/api/appointments/${id}/cancel`),
-  reminder: (id) => post(`/api/appointments/${id}/reminder`)
+  reminder: (id) => post(`/api/appointments/${id}/reminder`),
+  payment: (id, paid) => patch(`/api/appointments/${id}/payment?paid=${paid}`)
 }
 export const serviceApi = {
   update: (id, b) => put(`/api/services/${id}`, b),
@@ -91,5 +93,8 @@ export const adminApi = {
   createSubscriptionPlan: (b) => post('/api/admin/subscription-plans', b),
   updateSubscriptionPlan: (id, b) => put(`/api/admin/subscription-plans/${id}`, b),
   subscriptionPlanActive: (id, active) => patch(`/api/admin/subscription-plans/${id}/active?active=${active}`),
-  changeClinicSubscription: (clinicId, planId) => post(`/api/admin/subscription-plans/clinics/${clinicId}/change?planId=${planId}`)
+  changeClinicSubscription: (clinicId, planId) => post(`/api/admin/subscription-plans/clinics/${clinicId}/change?planId=${planId}`),
+  analytics: (date, month) => get(`/api/admin/analytics?date=${encodeURIComponent(date)}&month=${encodeURIComponent(month)}`),
+  subscriptionPayments: (month) => get(`/api/admin/subscription-plans/payments?month=${encodeURIComponent(month)}`),
+  subscriptionPaymentPaid: (id, paid) => patch(`/api/admin/subscription-plans/payments/${id}/paid?paid=${paid}`)
 }

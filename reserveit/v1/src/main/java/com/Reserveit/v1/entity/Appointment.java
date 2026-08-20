@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "appointments")
@@ -51,6 +52,21 @@ public class Appointment {
     @Builder.Default
     @Column(nullable = false)
     private AppointmentStatus status = AppointmentStatus.CONFIRMED;
+
+    /**
+     * Price captured at booking time so later service-price edits do not alter
+     * historical revenue.
+     */
+    @Builder.Default
+    @Column(nullable = false, precision = 12, scale = 2, columnDefinition = "numeric(12,2) default 0")
+    private BigDecimal price = BigDecimal.ZERO;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false, length = 20)
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
+
+    private LocalDateTime paidAt;
 
     private String notes;
 

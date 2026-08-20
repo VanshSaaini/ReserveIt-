@@ -11,6 +11,9 @@ import com.Reserveit.v1.repository.ClinicSubscriptionRepository;
 import com.Reserveit.v1.repository.DoctorRepository;
 import com.Reserveit.v1.repository.SubscriptionHistoryRepository;
 import com.Reserveit.v1.repository.SubscriptionPlanRepository;
+import com.Reserveit.v1.repository.SubscriptionPaymentRepository;
+
+
 import com.Reserveit.v1.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,13 +34,14 @@ public class ClinicSubscriptionService {
     private final SubscriptionHistoryRepository historyRepository;
     private final DoctorRepository doctorRepository;
     private final ClinicManagementService clinicManagementService;
+    private final SubscriptionPaymentRepository paymentRepository;
 
     @Transactional(readOnly = true)
     public ClinicSubscriptionResponse getMine() {
         Clinic clinic = clinicManagementService.findMyClinicEntity();
         ClinicSubscription subscription = subscriptionRepository.findByClinic_Id(clinic.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Your clinic does not have a subscription."));
-        return toResponse(subscription);
+                .orElse(null);
+        return subscription == null ? null : toResponse(subscription);
     }
 
     @Transactional(readOnly = true)
@@ -92,6 +96,7 @@ public class ClinicSubscriptionService {
                     .build();
             subscription = subscriptionRepository.save(subscription);
             recordHistory(subscription, "SUBSCRIPTION_STARTED", "Initial subscription selected.");
+            ensureMonthlyPayment(subscription, start);
             return toResponse(subscription);
         }
 
@@ -119,6 +124,7 @@ public class ClinicSubscriptionService {
         subscription.setStatus(SubscriptionStatus.ACTIVE);
 
         recordHistory(subscription, "RENEWED", "Subscription renewed for another billing period.");
+        ensureMonthlyPayment(subscription, newStart);
         return toResponse(subscription);
     }
 
@@ -197,6 +203,7 @@ public class ClinicSubscriptionService {
                 subscription.setEndDate(start.plusMonths(1).minusDays(1));
                 subscription.setStatus(SubscriptionStatus.ACTIVE);
                 recordHistory(subscription, "REACTIVATED", "Subscription reactivated on the selected plan.");
+                ensureMonthlyPayment(subscription, start);
             }
             return toResponse(subscription);
         }
@@ -207,8 +214,8 @@ public class ClinicSubscriptionService {
         if (downgrade && currentDoctors > newPlan.getMaxDoctors()) {
             throw new BadRequestException(
                     "Downgrade is not allowed while your clinic has " + currentDoctors +
-                    " doctors. Reduce the doctor count to " + newPlan.getMaxDoctors() +
-                    " or fewer first.");
+                            " doctors. Reduce the doctor count to " + newPlan.getMaxDoctors() +
+                            " or fewer first.");
         }
 
         String event = downgrade ? "PLAN_DOWNGRADED" : "PLAN_UPGRADED";
@@ -225,7 +232,25 @@ public class ClinicSubscriptionService {
         }
         subscription.setStatus(SubscriptionStatus.ACTIVE);
         recordHistory(subscription, event, note);
+        ensureMonthlyPayment(subscription, subscription.getStartDate());
         return toResponse(subscription);
+    }
+
+    private void ensureMonthlyPayment(ClinicSubscription subscription, LocalDate billingMonthDate) {
+        LocalDate month = billingMonthDate.withDayOfMonth(1);
+        SubscriptionPayment payment = paymentRepository
+                .findByClinic_IdAndBillingMonth(subscription.getClinic().getId(), month)
+                .orElseGet(() -> SubscriptionPayment.builder()
+                        .clinic(subscription.getClinic())
+                        .subscriptionPlan(subscription.getSubscriptionPlan())
+                        .billingMonth(month)
+                        .amount(subscription.getSubscriptionPlan().getPriceMonthly())
+                        .paid(false)
+                        .build());
+
+        payment.setSubscriptionPlan(subscription.getSubscriptionPlan());
+        payment.setAmount(subscription.getSubscriptionPlan().getPriceMonthly());
+        paymentRepository.save(payment);
     }
 
     private SubscriptionPlan activePlan(Long id) {
@@ -276,8 +301,7 @@ public class ClinicSubscriptionService {
                 s.getStartDate(),
                 s.getEndDate(),
                 days,
-                s.getUpdatedAt()
-        );
+                s.getUpdatedAt());
     }
 
     private SubscriptionHistoryResponse toHistoryResponse(SubscriptionHistory h) {
@@ -292,7 +316,6 @@ public class ClinicSubscriptionService {
                 h.getStartDate(),
                 h.getEndDate(),
                 h.getNotes(),
-                h.getCreatedAt()
-        );
+                h.getCreatedAt());
     }
 }

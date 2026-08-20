@@ -1,5 +1,6 @@
 package com.Reserveit.v1.dto.response;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,6 +19,9 @@ public record AppointmentResponse(
         LocalTime startTime,
         LocalTime endTime,
         String status,
+        BigDecimal price,
+        String paymentStatus,
+        LocalDateTime paidAt,
         String notes,
         LocalDateTime createdAt
 ) {

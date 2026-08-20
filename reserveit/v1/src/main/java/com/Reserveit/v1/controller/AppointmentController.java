@@ -52,10 +52,16 @@ public class AppointmentController {
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/payment")
+    @PreAuthorize("hasAnyRole('CLINIC_ADMIN', 'SUPER_ADMIN')")
+    public AppointmentResponse updatePayment(@PathVariable Long id, @RequestParam boolean paid) {
+        return appointmentManagementService.updatePayment(id, paid);
+    }
+
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('DOCTOR', 'CLINIC_ADMIN', 'SUPER_ADMIN')")
     public AppointmentResponse updateStatus(@PathVariable Long id,
-                                             @Valid @RequestBody AppointmentStatusUpdateRequest request) {
+            @Valid @RequestBody AppointmentStatusUpdateRequest request) {
         return appointmentManagementService.updateStatus(id, request);
     }
 

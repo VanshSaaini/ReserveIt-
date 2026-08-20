@@ -56,6 +56,9 @@ public class Mapper {
                 a.getStartTime(),
                 a.getEndTime(),
                 a.getStatus().name(),
+                a.getPrice() != null ? a.getPrice() : java.math.BigDecimal.ZERO,
+                a.getPaymentStatus() != null ? a.getPaymentStatus().name() : "PENDING",
+                a.getPaidAt(),
                 a.getNotes(),
                 a.getCreatedAt());
     }

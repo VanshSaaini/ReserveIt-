@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -77,6 +79,8 @@ public class AppointmentManagementService {
                 .startTime(startTime)
                 .endTime(endTime)
                 .status(AppointmentStatus.CONFIRMED)
+                .price(service != null && service.getPrice() != null ? service.getPrice() : BigDecimal.ZERO)
+                .paymentStatus(PaymentStatus.PENDING)
                 .notes(req.notes())
                 .build();
 
@@ -123,6 +127,16 @@ public class AppointmentManagementService {
         if (!sent) {
             throw new BadRequestException("The reminder email could not be sent. Check the Gmail SMTP configuration.");
         }
+    }
+
+    @Transactional
+    public AppointmentResponse updatePayment(Long appointmentId, boolean paid) {
+        Appointment appointment = findOrThrow(appointmentId);
+        assertClinicAdminCanManage(appointment);
+
+        appointment.setPaymentStatus(paid ? PaymentStatus.PAID : PaymentStatus.PENDING);
+        appointment.setPaidAt(paid ? LocalDateTime.now() : null);
+        return mapper.toAppointmentResponse(appointment);
     }
 
     @Transactional
@@ -194,6 +208,18 @@ public class AppointmentManagementService {
         Long userId = SecurityUtils.currentUserId();
         if (!appointment.getPatient().getUser().getId().equals(userId)) {
             throw new ForbiddenActionException("This appointment does not belong to you.");
+        }
+    }
+
+    private void assertClinicAdminCanManage(Appointment appointment) {
+        var principal = SecurityUtils.currentPrincipal();
+        if ("SUPER_ADMIN".equals(principal.getRole())) return;
+        if (!"CLINIC_ADMIN".equals(principal.getRole())) {
+            throw new ForbiddenActionException("Only a clinic admin can update appointment payment status.");
+        }
+        Clinic clinic = clinicManagementService.findMyClinicEntity();
+        if (!appointment.getClinic().getId().equals(clinic.getId())) {
+            throw new ForbiddenActionException("This appointment is not part of your clinic.");
         }
     }
 

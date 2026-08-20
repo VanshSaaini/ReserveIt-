@@ -667,3 +667,19 @@ If this repository is intended to be open source, add an appropriate license suc
 ---
 
 Built with React, Spring Boot, PostgreSQL, JWT, and Gmail SMTP.
+
+## Clinic Billing & Business Analytics
+
+Clinic administrators can now manage appointment billing and clinic performance from the dashboard.
+
+- Appointment price is captured when the booking is created, preserving historical revenue even if service prices change later.
+- Each appointment has `PENDING` or `PAID` payment status.
+- Clinic admins can mark an appointment paid or return it to pending.
+- Appointment history includes patient, doctor, service, date/time, price and payment status.
+- Daily booked revenue, collected revenue and pending revenue.
+- Monthly booked revenue, collected revenue and pending revenue.
+- Monthly appointment, completion, cancellation and payment KPIs.
+- Doctor-level appointment and revenue performance.
+- Service-level revenue performance.
+- Doctor/payment/status filters on the clinic appointment history.
+- Explicit SQL migration is provided under `v1/database/appointment_billing_phase.sql` for existing production databases.
