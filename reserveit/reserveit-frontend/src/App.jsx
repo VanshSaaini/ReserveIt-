@@ -19,6 +19,8 @@ import DoctorProfile from "./pages/DoctorProfile.jsx";
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminUsers from "./pages/AdminUsers.jsx";
 import AdminClinics from "./pages/AdminClinics.jsx";
+import AdminSubscriptionPlans from "./pages/AdminSubscriptionPlans.jsx";
+import ClinicSubscription from "./pages/ClinicSubscription.jsx";
 
 const R = ({ roles, children }) => (
   <ProtectedRoute roles={roles}>{children}</ProtectedRoute>
@@ -94,6 +96,14 @@ export default function App() {
         }
       />
       <Route
+        path="/clinic/subscription"
+        element={
+          <R roles={["CLINIC_ADMIN"]}>
+            <ClinicSubscription />
+          </R>
+        }
+      />
+      <Route
         path="/clinic/settings"
         element={
           <R roles={["CLINIC_ADMIN"]}>
@@ -146,6 +156,14 @@ export default function App() {
         element={
           <R roles={["SUPER_ADMIN"]}>
             <AdminUsers />
+          </R>
+        }
+      />
+      <Route
+        path="/admin/subscription-plans"
+        element={
+          <R roles={["SUPER_ADMIN"]}>
+            <AdminSubscriptionPlans />
           </R>
         }
       />

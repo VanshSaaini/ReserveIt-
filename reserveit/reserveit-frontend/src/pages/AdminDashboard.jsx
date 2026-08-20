@@ -77,6 +77,17 @@ export default function AdminDashboard() {
             </Link>
 
             <Link
+              to="/admin/subscription-plans"
+              className="action-card"
+            >
+              <strong>Manage subscriptions</strong>
+
+              <span>
+                Create plans, set doctor limits and control plan availability.
+              </span>
+            </Link>
+
+            <Link
               to="/admin/clinics"
               className="action-card"
             >

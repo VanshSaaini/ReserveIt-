@@ -72,6 +72,17 @@ export default function ClinicDashboard() {
 
           <div className="quick-grid">
             <Link
+              to="/clinic/subscription"
+              className="action-card"
+            >
+              <strong>Manage subscription</strong>
+
+              <span>
+                View your plan, usage, renewal date and upgrade or downgrade.
+              </span>
+            </Link>
+
+            <Link
               to="/clinic/doctors"
               className="action-card"
             >

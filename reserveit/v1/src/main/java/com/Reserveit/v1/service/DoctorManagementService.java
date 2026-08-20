@@ -28,6 +28,7 @@ public class DoctorManagementService {
     private final ClinicManagementService clinicManagementService;
     private final PasswordEncoder passwordEncoder;
     private final Mapper mapper;
+    private final ClinicSubscriptionService clinicSubscriptionService;
 
     @Transactional(readOnly = true)
     public List<DoctorResponse> listByClinic(Long clinicId) {
@@ -50,9 +51,15 @@ public class DoctorManagementService {
         return mapper.toDoctorResponse(findDoctorOrThrow(doctorId));
     }
 
+    @Transactional(readOnly = true)
+    public void assertCanAddDoctor(Long clinicId) {
+        clinicSubscriptionService.assertCanAddDoctor(clinicId);
+    }
+
     @Transactional
     public DoctorResponse createDoctor(DoctorCreateRequest req) {
         Clinic clinic = clinicManagementService.findMyClinicEntity();
+        clinicSubscriptionService.assertCanAddDoctor(clinic.getId());
 
         if (userRepository.existsByEmailIgnoreCase(req.email())) {
             throw new DuplicateResourceException("An account with this email already exists.");
