@@ -43,3 +43,14 @@ WHERE NOT EXISTS (
 -- keep the schema aligned with SubscriptionPayment.markedBy.
 ALTER TABLE subscription_payments
     ADD COLUMN IF NOT EXISTS marked_by_user_id BIGINT NULL REFERENCES users(id);
+
+-- Ensure subscription history timestamps are always populated.
+UPDATE subscription_history
+SET created_at = CURRENT_TIMESTAMP
+WHERE created_at IS NULL;
+
+ALTER TABLE subscription_history
+    ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
+ALTER TABLE subscription_history
+    ALTER COLUMN created_at SET NOT NULL;

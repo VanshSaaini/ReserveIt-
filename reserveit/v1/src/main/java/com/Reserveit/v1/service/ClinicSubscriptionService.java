@@ -280,6 +280,7 @@ public class ClinicSubscriptionService {
                 .priceMonthly(p.getPriceMonthly())
                 .maxDoctors(p.getMaxDoctors())
                 .notes(notes)
+                .createdAt(java.time.LocalDateTime.now())
                 .build());
     }
 

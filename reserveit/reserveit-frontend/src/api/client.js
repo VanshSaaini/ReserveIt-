@@ -53,7 +53,13 @@ export const clinicApi = {
   selectSubscriptionPlan: (planId) => post('/api/clinic/subscription', { planId }),
   renewSubscription: () => post('/api/clinic/subscription/renew'),
   cancelSubscription: () => post('/api/clinic/subscription/cancel'),
-  analytics: (date, month) => get(`/api/clinics/me/analytics?date=${encodeURIComponent(date)}&month=${encodeURIComponent(month)}`),
+  analytics: (date, month) => {
+    const params = new URLSearchParams();
+    if (date) params.set('date', date);
+    if (month) params.set('month', month);
+    const query = params.toString();
+    return get(`/api/clinics/me/analytics${query ? `?${query}` : ''}`);
+  },
 }
 export const doctorApi = {
   get: (id) => get(`/api/doctors/${id}`),
@@ -96,7 +102,18 @@ export const adminApi = {
   updateSubscriptionPlan: (id, b) => put(`/api/admin/subscription-plans/${id}`, b),
   subscriptionPlanActive: (id, active) => patch(`/api/admin/subscription-plans/${id}/active?active=${active}`),
   changeClinicSubscription: (clinicId, planId) => post(`/api/admin/subscription-plans/clinics/${clinicId}/change?planId=${planId}`),
-  analytics: (date, month) => get(`/api/admin/analytics?date=${encodeURIComponent(date)}&month=${encodeURIComponent(month)}`),
-  subscriptionPayments: (month) => get(`/api/admin/subscription-plans/payments?month=${encodeURIComponent(month)}`),
+  analytics: (date, month) => {
+    const params = new URLSearchParams();
+    if (date) params.set('date', date);
+    if (month) params.set('month', month);
+    const query = params.toString();
+    return get(`/api/admin/analytics${query ? `?${query}` : ''}`);
+  },
+  subscriptionPayments: (month) => {
+    const params = new URLSearchParams();
+    if (month) params.set('month', month);
+    const query = params.toString();
+    return get(`/api/admin/subscription-plans/payments${query ? `?${query}` : ''}`);
+  },
   subscriptionPaymentPaid: (id, paid) => patch(`/api/admin/subscription-plans/payments/${id}/paid?paid=${paid}`)
 }

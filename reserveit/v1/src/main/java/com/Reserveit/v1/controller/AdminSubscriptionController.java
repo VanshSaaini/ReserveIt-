@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -64,6 +65,7 @@ public class AdminSubscriptionController {
     // =========================================================
 
     @GetMapping("/payments")
+    @Transactional(readOnly = true)
     public List<SubscriptionPaymentResponse> payments(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM") YearMonth month) {
 
@@ -84,6 +86,7 @@ public class AdminSubscriptionController {
     // =========================================================
 
     @PatchMapping("/payments/{paymentId}/paid")
+    @Transactional
     public SubscriptionPaymentResponse markPaid(
             @PathVariable Long paymentId,
             @RequestParam boolean paid) {
