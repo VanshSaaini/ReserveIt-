@@ -61,6 +61,7 @@ export const doctorApi = {
   create: (b) => post('/api/doctors', b),
   active: (id, active) => patch(`/api/doctors/${id}/active`, { active }),
   me: () => get('/api/doctors/me'),
+  updateMe: (b) => put('/api/doctors/me', b),
   availability: () => get('/api/doctors/me/availability'),
   addAvailability: (b) => post('/api/doctors/me/availability', b),
   deleteAvailability: (id) => del(`/api/doctors/me/availability/${id}`)
@@ -86,6 +87,7 @@ export const serviceApi = {
 }
 export const adminApi = {
   users: () => get('/api/admin/users'),
+  userHierarchy: () => get('/api/admin/users/hierarchy'),
   userActive: (id, active) => patch(`/api/admin/users/${id}/active`, { active }),
   clinics: () => get('/api/admin/clinics'),
   clinicActive: (id, active) => patch(`/api/admin/clinics/${id}/active`, { active }),

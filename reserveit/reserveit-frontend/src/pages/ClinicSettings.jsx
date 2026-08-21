@@ -5,14 +5,19 @@ export default function ClinicSettings() {
   const [f, setF] = useState(null),
     [err, setErr] = useState(""),
     [msg, setMsg] = useState("");
-  useEffect(
-    () =>
-      clinicApi
-        .me()
-        .then(setF)
-        .catch((e) => setErr(e.message)),
-    [],
-  );
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const data = await clinicApi.me();
+        if (active) setF(data);
+      } catch (e) {
+        if (active) setErr(e.message);
+      }
+    };
+    load();
+    return () => { active = false; };
+  }, []);
   if (!f)
     return (
       <AppLayout title="Clinic settings">

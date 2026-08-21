@@ -38,3 +38,8 @@ WHERE NOT EXISTS (
     WHERE p.clinic_id = cs.clinic_id
       AND p.billing_month = date_trunc('month', cs.start_date)::date
 );
+
+-- If an earlier version created marked_by instead of marked_by_user_id,
+-- keep the schema aligned with SubscriptionPayment.markedBy.
+ALTER TABLE subscription_payments
+    ADD COLUMN IF NOT EXISTS marked_by_user_id BIGINT NULL REFERENCES users(id);

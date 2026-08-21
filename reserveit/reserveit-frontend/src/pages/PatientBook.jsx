@@ -52,7 +52,7 @@ export default function PatientBook() {
         startTime: slot.startTime,
         notes: "",
       });
-      setMsg("Appointment booked successfully.");
+      setMsg("Appointment booked successfully. The appointment fee has been recorded with your booking.");
     } catch (e) {
       setErr(e.message);
     }
@@ -125,6 +125,12 @@ export default function PatientBook() {
                 </select>
               </div>
             </div>
+            {service && (() => {
+              const selectedService = services.find((s) => String(s.id) === String(service));
+              return selectedService ? (
+                <div className="form-alert">Appointment fee: ₹{Number(selectedService.price || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })} · {selectedService.durationMinutes || "—"} minutes</div>
+              ) : null;
+            })()}
             <h3>Available slots</h3>
             {!doctor || !date ? (
               <Empty>Select a doctor and date.</Empty>
@@ -140,7 +146,7 @@ export default function PatientBook() {
                       key={s.startTime}
                       onClick={() => book(s)}
                     >
-                      {s.startTime} – {s.endTime}
+                      {s.startTime} – {s.endTime}{service && (() => { const selectedService = services.find((x) => String(x.id) === String(service)); return selectedService ? ` · ₹${Number(selectedService.price || 0).toLocaleString("en-IN")}` : ""; })()}
                     </button>
                   ))}
               </div>

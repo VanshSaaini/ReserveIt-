@@ -12,14 +12,19 @@ export default function PatientAppointments() {
     [reschedulingId, setReschedulingId] = useState(null),
     [form, setForm] = useState({ appointmentDate: "", startTime: "" });
 
-  useEffect(
-    () =>
-      appointmentApi
-        .mine()
-        .then(setA)
-        .catch((e) => setErr(e.message)),
-    [],
-  );
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      try {
+        const data = await appointmentApi.mine();
+        if (active) setA(data);
+      } catch (e) {
+        if (active) setErr(e.message);
+      }
+    };
+    load();
+    return () => { active = false; };
+  }, []);
 
   async function cancel(id) {
     try {
@@ -70,8 +75,11 @@ export default function PatientAppointments() {
                 <tr>
                   <th>Doctor</th>
                   <th>Clinic</th>
+                  <th>Service</th>
                   <th>Date</th>
                   <th>Time</th>
+                  <th>Duration</th>
+                  <th>Price</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
@@ -85,6 +93,7 @@ export default function PatientAppointments() {
                     <tr key={x.id}>
                       <td>{x.doctorName}</td>
                       <td>{x.clinicName}</td>
+                      <td>{x.serviceName || "Consultation"}</td>
                       {isRescheduling ? (
                         <>
                           <td>
@@ -115,9 +124,11 @@ export default function PatientAppointments() {
                       ) : (
                         <>
                           <td>{x.appointmentDate}</td>
-                          <td>{x.startTime}</td>
+                          <td>{x.startTime} – {x.endTime}</td>
                         </>
                       )}
+                      <td>{x.endTime && x.startTime ? `${Math.round((new Date(`1970-01-01T${x.endTime}`) - new Date(`1970-01-01T${x.startTime}`)) / 60000)} min` : "—"}</td>
+                      <td>₹{Number(x.price || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
                       <td>
                         <span className="status">{x.status}</span>
                       </td>

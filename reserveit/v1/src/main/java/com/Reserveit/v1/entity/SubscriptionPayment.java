@@ -48,6 +48,7 @@ public class SubscriptionPayment {
 
     private LocalDateTime paidAt;
 
+    @Column(name = "marked_by_user_id")
     private Long markedBy;
 
     @Column(nullable = false, updatable = false)

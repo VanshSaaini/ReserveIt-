@@ -1,6 +1,7 @@
 package com.Reserveit.v1.service;
 
 import com.Reserveit.v1.dto.request.DoctorCreateRequest;
+import com.Reserveit.v1.dto.request.DoctorUpdateRequest;
 import com.Reserveit.v1.dto.response.DoctorResponse;
 import com.Reserveit.v1.entity.Clinic;
 import com.Reserveit.v1.entity.Doctor;
@@ -44,6 +45,22 @@ public class DoctorManagementService {
     @Transactional(readOnly = true)
     public DoctorResponse getMyProfile() {
         return mapper.toDoctorResponse(findMyDoctorEntity());
+    }
+
+    @Transactional
+    public DoctorResponse updateMyProfile(DoctorUpdateRequest req) {
+        Doctor doctor = findMyDoctorEntity();
+        User user = doctor.getUser();
+        user.setFirstName(req.firstName());
+        user.setLastName(req.lastName());
+        user.setMobile(req.mobile());
+        doctor.setSpecialization(req.specialization());
+        doctor.setQualifications(req.qualifications());
+        doctor.setExperienceYears(req.experienceYears());
+        if (req.defaultSlotMinutes() != null && req.defaultSlotMinutes() > 0) {
+            doctor.setDefaultSlotMinutes(req.defaultSlotMinutes());
+        }
+        return mapper.toDoctorResponse(doctor);
     }
 
     @Transactional(readOnly = true)

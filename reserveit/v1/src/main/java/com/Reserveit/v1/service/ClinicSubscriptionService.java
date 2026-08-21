@@ -288,6 +288,8 @@ public class ClinicSubscriptionService {
         long days = Math.max(0, ChronoUnit.DAYS.between(today, s.getEndDate()));
         int currentDoctors = doctorRepository.findByClinic_Id(s.getClinic().getId()).size();
         int remaining = Math.max(0, s.getSubscriptionPlan().getMaxDoctors() - currentDoctors);
+        var payment = paymentRepository.findByClinic_IdAndBillingMonth(
+                s.getClinic().getId(), s.getStartDate().withDayOfMonth(1)).orElse(null);
         return new ClinicSubscriptionResponse(
                 s.getId(),
                 s.getClinic().getId(),
@@ -301,6 +303,8 @@ public class ClinicSubscriptionService {
                 s.getStartDate(),
                 s.getEndDate(),
                 days,
+                payment != null && payment.isPaid(),
+                payment == null ? null : payment.getPaidAt(),
                 s.getUpdatedAt());
     }
 

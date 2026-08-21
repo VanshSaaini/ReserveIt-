@@ -19,5 +19,7 @@ public record ClinicSubscriptionResponse(
         LocalDate startDate,
         LocalDate endDate,
         long daysRemaining,
+        boolean feeCollected,
+        LocalDateTime feeCollectedAt,
         LocalDateTime updatedAt
 ) {}

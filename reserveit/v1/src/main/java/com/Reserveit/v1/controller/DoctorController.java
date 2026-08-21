@@ -2,6 +2,7 @@ package com.Reserveit.v1.controller;
 
 import com.Reserveit.v1.dto.request.AvailabilityRequest;
 import com.Reserveit.v1.dto.request.DoctorCreateRequest;
+import com.Reserveit.v1.dto.request.DoctorUpdateRequest;
 import com.Reserveit.v1.dto.response.AvailabilityResponse;
 import com.Reserveit.v1.dto.response.DoctorResponse;
 import com.Reserveit.v1.dto.response.SlotResponse;
@@ -56,6 +57,12 @@ public class DoctorController {
     @PreAuthorize("hasRole('DOCTOR')")
     public DoctorResponse getMyProfile() {
         return doctorManagementService.getMyProfile();
+    }
+
+    @PutMapping("/me")
+    @PreAuthorize("hasRole('DOCTOR')")
+    public DoctorResponse updateMyProfile(@Valid @RequestBody DoctorUpdateRequest request) {
+        return doctorManagementService.updateMyProfile(request);
     }
 
     @GetMapping("/me/availability")

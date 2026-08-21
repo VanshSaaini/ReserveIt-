@@ -100,10 +100,8 @@ export default function ClinicSubscription() {
               label="Remaining capacity"
               value={subscription.remainingDoctors}
             />
-            <StatCard
-              label="Status"
-              value={subscription.status}
-            />
+            <StatCard label="Status" value={subscription.status} />
+            <StatCard label="Fee collection" value={subscription.feeCollected ? "Collected" : "Pending"} />
           </div>
 
           <section className="panel">
@@ -133,7 +131,12 @@ export default function ClinicSubscription() {
               </div>
             </div>
             <p>
-              {subscription.daysRemaining} day(s) remaining.
+              {subscription.daysRemaining} day(s) remaining. Fee is collected offline by ReserveIt administration; no online payment is required here.
+            </p>
+            <p>
+              {subscription.feeCollectedAt ? `Collected: ${new Date(subscription.feeCollectedAt).toLocaleString()}` : "Subscription fee: pending offline collection."}
+            </p>
+            <p>
               {subscription.status === "EXPIRING" &&
                 " Your subscription is approaching its end date."}
             </p>

@@ -2,6 +2,7 @@ package com.Reserveit.v1.controller;
 
 import com.Reserveit.v1.dto.request.ActiveStatusRequest;
 import com.Reserveit.v1.dto.response.ClinicResponse;
+import com.Reserveit.v1.dto.response.ClinicUserHierarchyResponse;
 import com.Reserveit.v1.dto.response.UserResponse;
 import com.Reserveit.v1.service.AdminService;
 import com.Reserveit.v1.service.ClinicManagementService;
@@ -25,6 +26,11 @@ public class AdminController {
     @GetMapping("/users")
     public List<UserResponse> listUsers() {
         return adminService.listUsers();
+    }
+
+    @GetMapping("/users/hierarchy")
+    public List<ClinicUserHierarchyResponse> userHierarchy() {
+        return adminService.userHierarchy();
     }
 
     @PatchMapping("/users/{id}/active")
